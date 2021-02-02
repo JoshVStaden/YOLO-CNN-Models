@@ -5,6 +5,7 @@ import keras
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPool2D, Flatten, Dense
 from keras.preprocessing.image import ImageDataGenerator
+from keras.preprocessing import image
 from tensorflow.keras.applications.vgg16 import VGG16
 import matplotlib.pyplot as plt
 
@@ -40,7 +41,7 @@ class YOLO:
         traindata = trdata.flow_from_directory(directory=train_dir, target_size=(224,224))
         tsdata = ImageDataGenerator()
         testdata = tsdata.flow_from_directory(directory=test_dir, target_size=(224,224))
-        self.hist = self.model.fit(traindata, steps_per_epoch=70, validation_data=testdata, validation_steps=10, epochs=5)
+        self.hist = self.model.fit(traindata, steps_per_epoch=14, validation_data=testdata, validation_steps=10, epochs=5)
     
     def save_model(self, filename="latest_model.h5"):
         self.model.save(filename)
@@ -58,6 +59,25 @@ class YOLO:
             plt.xlabel("Epoch")
             plt.legend(["Accuracy", "Validation Accuracy", "Loss", "Validation Loss"])
             plt.show()
+
+    def classify_image(self, filename):
+        img = image.load_img(filename, target_size=(224,224))
+        img = np.asarray(img)
+        img_expanded = np.expand_dims(img, axis=0)
+
+        model_output = self.model.predict(img_expanded)
+        prediction = "No prediction"
+        if model_output[0][0] > model_output[0][1]:
+            print("Found a cat")
+            prediction = "Cat"
+        else:
+            print("Found a dog")
+            prediction = "Dog"
+        
+        plt.imshow(img)
+        plt.title(prediction)
+        plt.show()
+        plt.close()
 
 yolo = YOLO("yolo")
 yolo.train_model("model_images/train_set", "model_images/test_set")
