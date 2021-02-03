@@ -26,8 +26,11 @@ class YOLO:
         
 
 
-    def get_Yolo3_model(self,num_classes):
-        return self.VGG16_body((224, 224, 3), num_classes)
+    def get_Yolo3_model(self,num_classes, backbone='vgg16'):
+        if backbone == 'vgg16':
+            return self.VGG16_body((224, 224, 3), num_classes)
+        else:
+            return self.VGG16_body((224, 224, 3), num_classes)
 
 
 
